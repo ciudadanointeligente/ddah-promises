@@ -1,11 +1,10 @@
-=============
-ddah-promises
-=============
+# ddah-promises
+
+[![Build Status](https://travis-ci.org/ciudadanointeligente/ddah-promises.png?branch=master)](https://travis-ci.org/ciudadanointeligente/ddah-promises)
 
 Django's promises egg.
 
-Quick start
------------
+## Quick start
 
 1. Add "ddah-promises" to INSTALLED_APPS:
   INSTALLED_APPS = {
@@ -18,7 +17,9 @@ Quick start
 
 3. Run `python manage.py syncdb` to create ddah-promises's models.
 
-4. Run the development server and access http://127.0.0.1:8000/admin/ to
-    manage blog posts.
+This project is licensed under the GNU Affero General Public License (AGPL). For more information you can access to the [digital license edition here](http://www.gnu.org/licenses/agpl-3.0.html).
 
-5. Access http://127.0.0.1:8000/ddah-promises/ to view a list of most recent posts.
+### Everything else:
+
+For more information about us, our site [Fundación Ciudadano Inteligente](http://www.ciudadanointeligente.org/).
+And if you want help with patches, report bugs or replicate our project check [our repositories](https://github.com/ciudadanointeligente/).
