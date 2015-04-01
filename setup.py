@@ -1,32 +1,39 @@
 import os
 from setuptools import setup
- 
+
 README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
- 
+
 # Allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
- 
+
 setup(
     name = 'ddah-promises',
     version = '0.1',
     packages = ['promises'],
     include_package_data = True,
-    license = 'BSD License',
-    description = 'A simple Django app demo.',
+    license = 'Affero',
+    description = 'Promises app.',
     long_description = README,
-    url = 'http://www.example.com/',
-    author = 'Your Name',
-    author_email = 'yourname@example.com',
+    test_suite = 'runtests.runtests',
+    url = 'http://github.com/ciudadanointeligente/ddah-promises',
+    author = 'Felipe Álvarez / Juan Pablo Pérez Trabucco,
+    author_email = 'lab@ciudadanointeligente.org',
     classifiers =[
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License', # example license
+        'License :: OSI Approved :: Affero',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content'
-    ]
+    ],
+    install_requires =[
+        'django-popolo',
+    ],
+    dependency_links =[
+        'http://github.com/openpolis/django-popolo/tarball/master#egg=django-popolo'
+    ],
 )
