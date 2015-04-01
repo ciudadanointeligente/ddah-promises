@@ -16,7 +16,7 @@ setup(
     long_description = README,
     test_suite = 'runtests.runtests',
     url = 'http://github.com/ciudadanointeligente/ddah-promises',
-    author = 'Felipe Álvarez / Juan Pablo Pérez Trabucco,
+    author = u'Felipe Álvarez / Juan Pablo Pérez Trabucco',
     author_email = 'lab@ciudadanointeligente.org',
     classifiers =[
         'Environment :: Web Environment',
