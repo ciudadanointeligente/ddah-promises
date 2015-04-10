@@ -3,7 +3,6 @@ python:
   - "2.7"
   - "3.3"
 install:
-  - "pip install Django==1.6.10"
   - "pip install -r tests_requirements.txt"
   - "python setup.py develop"
 #  - "pip install coveralls"
