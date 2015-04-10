@@ -6,7 +6,7 @@ install:
   - "python setup.py develop"
   - "pip install coveralls"
 script:
-  - "coverage run --source=promises manage.py test"
+  - "coverage run --source=promises runtests.py"
 after_success:
   - coverage report -m
   - coveralls
