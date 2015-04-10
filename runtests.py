@@ -2,26 +2,13 @@
 import sys
 
 from django.conf import settings
+import django
 
 
 if not settings.configured:
-    settings.configure(
-        DATABASES={
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': ':memory:',
-            }
-        },
-        INSTALLED_APPS=(
-            'django.contrib.contenttypes',
-            'django_faker',
-            'popolo',
-        ),
-        SITE_ID=1,
-        SECRET_KEY='this-is-just-for-tests-so-not-that-secret',
-        ROOT_URLCONF='popolo.urls',
-    )
-
+    import os
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'testing_settings'
+    django.setup()
 
 from django.test.utils import get_runner
 
