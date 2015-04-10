@@ -34,6 +34,9 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content'
     ],
     install_requires =[
+        'django-annoying',
+        'django-taggit',
+        'south',
         'django-popolo',
     ],
     dependency_links =[
