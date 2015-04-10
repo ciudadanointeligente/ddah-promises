@@ -1,6 +1,5 @@
 from django.test import TestCase
 from django.utils.timezone import now
-from popit.models import ApiInstance, Person as PopitPerson
 from popolo.models import Person
 from ..models import Promise, InformationSource
 

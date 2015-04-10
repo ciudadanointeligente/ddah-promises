@@ -4,7 +4,6 @@ from .models import Promise, Fulfillment, \
                     VerificationDocument, Milestone
 from popolo.models import Person
 from django.forms import ModelForm
-from adminsortable.admin import SortableAdminMixin
 
 # Register your models here.
 
@@ -21,7 +20,7 @@ class VerificationDocumentInline(admin.TabularInline):
 class MilestoneInline(admin.TabularInline):
     model = Milestone
 
-class PromiseAdmin(SortableAdminMixin, admin.ModelAdmin):
+class PromiseAdmin(admin.ModelAdmin):
     inlines = (FulfillmentInlineAdmin,
                InformationSourceInline,
                VerificationDocumentInline,

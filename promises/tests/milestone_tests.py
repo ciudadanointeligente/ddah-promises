@@ -3,7 +3,6 @@ from django.utils.timezone import now
 from datetime import timedelta
 from ..models import Promise, Category, Milestone
 from popolo.models import Person
-from taggit.models import Tag
 
 nownow = now()
 class MilestoneTestCase(TestCase):

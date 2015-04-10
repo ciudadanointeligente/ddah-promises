@@ -1,4 +1,4 @@
-Django==1.6.10
-nose
+Django==1.8
+-e git://github.com/django-nose/django-nose.git#egg=django-nose
 fake-factory==0.3.2
 django-faker

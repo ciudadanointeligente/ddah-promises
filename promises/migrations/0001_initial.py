@@ -1,142 +1,112 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+import autoslug.fields
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Category'
-        db.create_table(u'promises_category', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=512)),
-            ('slug', self.gf('autoslug.fields.AutoSlugField')(unique_with=(), max_length=50, populate_from='name')),
-        ))
-        db.send_create_signal(u'promises', ['Category'])
+    dependencies = [
+        ('popolo', '__first__'),
+    ]
 
-        # Adding model 'Promise'
-        db.create_table(u'promises_promise', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=512)),
-            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('person', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['popolo.Person'])),
-            ('category', self.gf('django.db.models.fields.related.ForeignKey')(related_name='promises', null=True, to=orm['promises.Category'])),
-        ))
-        db.send_create_signal(u'promises', ['Promise'])
-
-        # Adding model 'InformationSource'
-        db.create_table(u'promises_informationsource', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('url', self.gf('django.db.models.fields.URLField')(max_length=200)),
-            ('display_name', self.gf('django.db.models.fields.CharField')(max_length=512)),
-            ('date', self.gf('django.db.models.fields.DateField')()),
-            ('promise', self.gf('django.db.models.fields.related.ForeignKey')(related_name='information_sources', to=orm['promises.Promise'])),
-        ))
-        db.send_create_signal(u'promises', ['InformationSource'])
-
-        # Adding model 'VerificationDocument'
-        db.create_table(u'promises_verificationdocument', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('url', self.gf('django.db.models.fields.URLField')(max_length=200)),
-            ('display_name', self.gf('django.db.models.fields.CharField')(max_length=512)),
-            ('date', self.gf('django.db.models.fields.DateField')()),
-            ('promise', self.gf('django.db.models.fields.related.ForeignKey')(related_name='verification_documents', null=True, to=orm['promises.Promise'])),
-        ))
-        db.send_create_signal(u'promises', ['VerificationDocument'])
-
-        # Adding model 'Fulfillment'
-        db.create_table(u'promises_fulfillment', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('promise', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['promises.Promise'], unique=True)),
-            ('percentage', self.gf('django.db.models.fields.PositiveIntegerField')(default=0)),
-            ('notes', self.gf('django.db.models.fields.TextField')(default='', blank=True)),
-        ))
-        db.send_create_signal(u'promises', ['Fulfillment'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Category'
-        db.delete_table(u'promises_category')
-
-        # Deleting model 'Promise'
-        db.delete_table(u'promises_promise')
-
-        # Deleting model 'InformationSource'
-        db.delete_table(u'promises_informationsource')
-
-        # Deleting model 'VerificationDocument'
-        db.delete_table(u'promises_verificationdocument')
-
-        # Deleting model 'Fulfillment'
-        db.delete_table(u'promises_fulfillment')
-
-
-    models = {
-        u'popolo.person': {
-            'Meta': {'object_name': 'Person'},
-            'additional_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'biography': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'birth_date': ('django.db.models.fields.CharField', [], {'max_length': '10', 'blank': 'True'}),
-            'created_at': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
-            'death_date': ('django.db.models.fields.CharField', [], {'max_length': '10', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'null': 'True', 'blank': 'True'}),
-            'end_date': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
-            'family_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'gender': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'given_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'honorific_prefix': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'honorific_suffix': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'image': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'patronymic_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'slug': ('autoslug.fields.AutoSlugField', [], {'unique': 'True', 'max_length': '50', 'populate_from': 'None', 'unique_with': '()'}),
-            'sort_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'start_date': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
-            'summary': ('django.db.models.fields.CharField', [], {'max_length': '512', 'blank': 'True'}),
-            'updated_at': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'})
-        },
-        u'promises.category': {
-            'Meta': {'object_name': 'Category'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '512'}),
-            'slug': ('autoslug.fields.AutoSlugField', [], {'unique_with': '()', 'max_length': '50', 'populate_from': "'name'"})
-        },
-        u'promises.fulfillment': {
-            'Meta': {'object_name': 'Fulfillment'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'notes': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'percentage': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
-            'promise': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['promises.Promise']", 'unique': 'True'})
-        },
-        u'promises.informationsource': {
-            'Meta': {'object_name': 'InformationSource'},
-            'date': ('django.db.models.fields.DateField', [], {}),
-            'display_name': ('django.db.models.fields.CharField', [], {'max_length': '512'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'promise': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'information_sources'", 'to': u"orm['promises.Promise']"}),
-            'url': ('django.db.models.fields.URLField', [], {'max_length': '200'})
-        },
-        u'promises.promise': {
-            'Meta': {'object_name': 'Promise'},
-            'category': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'promises'", 'null': 'True', 'to': u"orm['promises.Category']"}),
-            'date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '512'}),
-            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['popolo.Person']"})
-        },
-        u'promises.verificationdocument': {
-            'Meta': {'object_name': 'VerificationDocument'},
-            'date': ('django.db.models.fields.DateField', [], {}),
-            'display_name': ('django.db.models.fields.CharField', [], {'max_length': '512'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'promise': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'verification_documents'", 'null': 'True', 'to': u"orm['promises.Promise']"}),
-            'url': ('django.db.models.fields.URLField', [], {'max_length': '200'})
-        }
-    }
-
-    complete_apps = ['promises']
+    operations = [
+        migrations.CreateModel(
+            name='Category',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=512)),
+                ('slug', autoslug.fields.AutoSlugField(editable=False)),
+            ],
+            options={
+                'verbose_name': 'Category',
+                'verbose_name_plural': 'Categories',
+            },
+        ),
+        migrations.CreateModel(
+            name='Fulfillment',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('percentage', models.PositiveIntegerField(default=0)),
+                ('status', models.TextField(default=b'', blank=True)),
+                ('description', models.TextField(default=b'', blank=True)),
+            ],
+            options={
+                'verbose_name': 'Fulfilment',
+                'verbose_name_plural': 'Fulfilments',
+            },
+        ),
+        migrations.CreateModel(
+            name='InformationSource',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('url', models.URLField()),
+                ('display_name', models.CharField(max_length=512)),
+                ('date', models.DateField()),
+            ],
+            options={
+                'verbose_name': 'Information Source',
+                'verbose_name_plural': 'Information Sources',
+            },
+        ),
+        migrations.CreateModel(
+            name='Milestone',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date', models.DateField()),
+                ('description', models.TextField()),
+            ],
+            options={
+                'ordering': ('date',),
+                'verbose_name': 'Milestone',
+                'verbose_name_plural': 'Milestones',
+            },
+        ),
+        migrations.CreateModel(
+            name='Promise',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=2048)),
+                ('description', models.TextField(blank=True)),
+                ('date', models.DateField(null=True, blank=True)),
+                ('order', models.PositiveIntegerField(default=0)),
+                ('category', models.ForeignKey(related_name='promises', to='promises.Category', null=True)),
+                ('person', models.ForeignKey(to='popolo.Person')),
+            ],
+            options={
+                'ordering': ('order',),
+                'verbose_name': 'Promise',
+                'verbose_name_plural': 'Promises',
+            },
+        ),
+        migrations.CreateModel(
+            name='VerificationDocument',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('url', models.URLField()),
+                ('display_name', models.CharField(max_length=512)),
+                ('date', models.DateField()),
+                ('promise', models.ForeignKey(related_name='verification_documents', to='promises.Promise', null=True)),
+            ],
+            options={
+                'verbose_name': 'Verification Document',
+                'verbose_name_plural': 'Verification Documents',
+            },
+        ),
+        migrations.AddField(
+            model_name='milestone',
+            name='promise',
+            field=models.ForeignKey(related_name='milestones', to='promises.Promise'),
+        ),
+        migrations.AddField(
+            model_name='informationsource',
+            name='promise',
+            field=models.ForeignKey(related_name='information_sources', to='promises.Promise'),
+        ),
+        migrations.AddField(
+            model_name='fulfillment',
+            name='promise',
+            field=models.OneToOneField(to='promises.Promise'),
+        ),
+    ]

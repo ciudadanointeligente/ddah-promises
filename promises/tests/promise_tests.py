@@ -1,9 +1,8 @@
 from django.test import TestCase
 from django.utils.timezone import now
 from ..models import Promise, Fulfillment, Category
-from popit.models import Person as PopitPerson, ApiInstance
 from popolo.models import Person
-from taggit.models import Tag
+from django.db import IntegrityError
 
 nownow = now()
 class PromiseTestCase(TestCase):
@@ -43,18 +42,6 @@ class PromiseTestCase(TestCase):
 
         self.assertEquals(promise.__unicode__(), "A person promessed this is a promise with 0%")
 
-    def test_a_promise_has_tags(self):
-        '''A promise has tags'''
-        promise = Promise.objects.create(name="this is a promise",\
-                                         description="this is a description",\
-                                         date = nownow,\
-                                         person = self.person
-                                         )
-        promise.tags.add('education')
-        self.assertEquals(promise.tags.count(), 1)
-        self.assertEquals(promise.tags.first().name,'education')
-
-
     def test_a_promise_has_one_fulfillment(self):
         '''A Promise has one fulfillment'''
         promise = Promise.objects.create(name="this is a promise",\
@@ -78,17 +65,14 @@ class PromiseTestCase(TestCase):
         self.assertIsInstance(promise.fulfillment, Fulfillment)
 
 
-    def test_automatically_does_not_try_to_create_two_fulfillments(self):
+    def test_does_create_two_fulfillments(self):
         '''When saving a promise does not try to create two fulfillments'''
         promise = Promise.objects.create(name="this is a promise",\
                                          description="this is a description",\
                                          date = nownow,\
                                          person = self.person
                                          )
-        fulfillment = promise.fulfillment
         promise.save()
-        self.assertEquals(fulfillment, promise.fulfillment)
-
 
     def test_promises_have_a_ordering_field(self):
         '''Promises have an ordering field'''

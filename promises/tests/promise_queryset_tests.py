@@ -2,9 +2,7 @@ from django.test import TestCase
 from django.utils.timezone import now
 from ..models import Promise, Fulfillment, Category
 from ..queryset import PromiseSummary
-from popit.models import Person as PopitPerson, ApiInstance
 from popolo.models import Person
-from taggit.models import Tag
 
 nownow = now()
 
