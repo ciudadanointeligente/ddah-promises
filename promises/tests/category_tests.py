@@ -3,7 +3,6 @@ from django.test import TestCase
 from django.utils.timezone import now
 from ..models import Promise, Category
 from popolo.models import Person
-from taggit.models import Tag
 
 nownow = now()
 class CategoryTestCase(TestCase):

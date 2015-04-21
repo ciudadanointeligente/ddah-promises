@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.utils.timezone import now
 from ..models import Promise, Fulfillment, VerificationDocument
 from popolo.models import Person
-from taggit.models import Tag
 
 nownow = now()
 class VerificationDocumentTestCase(TestCase):
