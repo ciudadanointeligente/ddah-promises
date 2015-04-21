@@ -1,2 +1,1 @@
-Django==1.8
 -e git://github.com/django-nose/django-nose.git#egg=django-nose

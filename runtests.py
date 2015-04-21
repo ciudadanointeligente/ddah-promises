@@ -8,7 +8,9 @@ import django
 if not settings.configured:
     import os
     os.environ['DJANGO_SETTINGS_MODULE'] = 'testing_settings'
-    django.setup()
+    from distutils.version import StrictVersion
+    if not StrictVersion(django.get_version()) < StrictVersion("1.8"):
+        django.setup()
 
 from django.test.utils import get_runner
 
