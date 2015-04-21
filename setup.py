@@ -17,12 +17,12 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='ddah-promises',
-    version='0.1',
+    version='0.1.2',
     packages=['promises'],
     include_package_data=True,
     license='Affero',
     description='Promises app.',
-    long_description=read_file('README.md'),
+    long_description=read_file('README.rst'),
     test_suite='runtests.runtests',
     url='http://github.com/ciudadanointeligente/ddah-promises',
     author=u'Felipe Álvarez / Juan Pablo Pérez Trabucco',
