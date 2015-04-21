@@ -34,7 +34,6 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content'
     ],
     install_requires =[
-        'django-taggit',
         'django-popolo',
     ],
     dependency_links =[
