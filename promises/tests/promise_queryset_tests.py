@@ -100,5 +100,42 @@ class PromiseQuerysetTestCase(TestCase):
         self.assertEquals(summary.no_progress_percentage, float(0))
         self.assertEquals(summary.total_progress, float(0))
 
+    def test_queryset_ordered(self):
 
+        promise_1 = Promise.objects.create(name="this is a promise 1",\
+                                         category=self.category,\
+                                         person = self.person\
+                                         )
+        # promises half accomplished
+        promise_2 = Promise.objects.create(name="this is a promise 2",\
+                                         category=self.category,\
+                                         person = self.person\
+                                         )
+        promise_2.fulfillment.percentage = 50
+        promise_2.fulfillment.save()
+        promise_4 = Promise.objects.create(name="this is a promise 4",\
+                                         category=self.category,\
+                                         person = self.person\
+                                         )
+        promise_4.fulfillment.percentage = 1
+        promise_4.fulfillment.save()
+        promise_5 = Promise.objects.create(name="this is a promise 5",\
+                                         category=self.category,\
+                                         person = self.person\
+                                         )
+        promise_5.fulfillment.percentage = 99
+        promise_5.fulfillment.save()
+        #fully acoomplished promises
+        promise_3 = Promise.objects.create(name="this is a promise 3",\
+                                         category=self.category,\
+                                         person = self.person\
+                                         )
+        promise_3.fulfillment.percentage = 100
+        promise_3.fulfillment.save()
 
+        promises = Promise.objects.all()
+        self.assertEquals(promises[0], promise_3)
+        self.assertEquals(promises[1], promise_5)
+        self.assertEquals(promises[2], promise_2)
+        self.assertEquals(promises[3], promise_4)
+        self.assertEquals(promises[4], promise_1)

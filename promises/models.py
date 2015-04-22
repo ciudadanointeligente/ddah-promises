@@ -38,7 +38,6 @@ class Promise(models.Model):
     class Meta:
         verbose_name = _("Promise")
         verbose_name_plural = _("Promises")
-        ordering = ('order',)
 
     def save(self, *args, **kwargs):
         creating = self.pk is None

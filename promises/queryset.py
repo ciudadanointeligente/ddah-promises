@@ -1,5 +1,7 @@
 
 from django.db import models
+from django.db.models import Avg
+
 
 class PromiseSummary(object):
     def __init__(self, accomplished=0,\
@@ -48,10 +50,11 @@ class PromiseQuerySet(models.query.QuerySet):
             total_progress += promise.fulfillment.percentage
         try:
             summary.total_progress = float(total_progress)/float(self.count())
-        except ZeroDivisionError, e:
+        except ZeroDivisionError:
             summary.total_progress = 0
         return summary
 
+
 class PromiseManager(models.Manager):
     def get_queryset(self):
-        return PromiseQuerySet(self.model, using=self._db)
+        return PromiseQuerySet(self.model, using=self._db).annotate(percentage=Avg('fulfillment__percentage')).order_by('-percentage', 'order')
