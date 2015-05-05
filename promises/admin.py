@@ -8,7 +8,8 @@ from django.forms import ModelForm
 # Register your models here.
 
 class FulfillmentInlineAdmin(admin.StackedInline):
-	model = Fulfillment
+    model = Fulfillment
+    extra = 0
 
 class InformationSourceInline(admin.TabularInline):
     model = InformationSource
