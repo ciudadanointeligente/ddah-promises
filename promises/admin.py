@@ -34,7 +34,12 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', )
 admin.site.register(Person, PersonAdmin)
 
-class CategoryAdmin(admin.ModelAdmin):
-    pass
+try:
+    from adminsortable2.admin import SortableAdminMixin
+    class CategoryAdmin(SortableAdminMixin, admin.ModelAdmin):
+        pass
+except:
+    class CategoryAdmin(admin.ModelAdmin):
+        pass
 admin.site.register(Category, CategoryAdmin)
 

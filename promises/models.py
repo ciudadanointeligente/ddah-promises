@@ -7,8 +7,10 @@ from django.utils.translation import ugettext_lazy as _
 class Category(models.Model):
     name = models.CharField(max_length=512)
     slug = AutoSlugField(populate_from='name')
+    order = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     class Meta:
+        ordering = ('order', )
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
 
