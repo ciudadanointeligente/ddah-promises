@@ -14,6 +14,8 @@ INSTALLED_APPS = (
     'popolo',
     'promises',
 )
+MIDDLEWARE_CLASSES = {
+}
 SITE_ID = 1
 SECRET_KEY = 'this-is-just-for-tests-so-not-that-secret'
 ROOT_URLCONF = 'popolo.urls'

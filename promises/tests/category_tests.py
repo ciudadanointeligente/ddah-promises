@@ -27,6 +27,14 @@ class CategoryTestCase(TestCase):
         self.assertTrue(category.slug)
         self.assertEquals(category.slug, 'education')
 
+    def test_category_ordering(self):
+        '''Categories can be ordered'''
+        category1 = Category.objects.create(name="Education", order=2)
+        category2 = Category.objects.create(name="Education", order=1)
+        all_categories = Category.objects.all()
+        self.assertEquals(category2, all_categories[0])
+        self.assertEquals(category1, all_categories[1])
+
     def test_unicode(self):
         '''A category has a unicode'''
         category = Category.objects.create(name="Education")
