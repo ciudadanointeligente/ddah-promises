@@ -41,7 +41,6 @@ setup(
     ],
     install_requires=[
         'django-popolo',
-        'django-admin-sortable2',
     ],
     dependency_links=[
         'http://github.com/openpolis/django-popolo/tarball/master#egg=django-popolo'
