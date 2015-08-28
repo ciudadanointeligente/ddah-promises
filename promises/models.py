@@ -29,7 +29,7 @@ class Promise(models.Model):
     name = models.CharField(max_length=2048)
     description = models.TextField(blank=True)
     date = models.DateField(null=True, blank=True)
-    person = models.ForeignKey(Person)
+    person = models.ForeignKey(Person, null=True, blank=True)
     category = models.ForeignKey(Category, related_name="promises" ,null=True)
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
 
