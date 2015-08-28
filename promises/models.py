@@ -32,6 +32,7 @@ class Promise(models.Model):
     person = models.ForeignKey(Person, null=True, blank=True)
     category = models.ForeignKey(Category, related_name="promises" ,null=True)
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
+    ponderator = models.FloatField(default=None, null=True, blank=True)
 
     objects = PromiseManager()
 

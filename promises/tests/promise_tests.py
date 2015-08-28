@@ -19,6 +19,7 @@ class PromiseTestCase(TestCase):
         self.assertEquals(promise.name, "this is a promise")
         self.assertEquals(promise.description, "this is a description")
         self.assertEquals(promise.date, nownow)
+        self.assertIsNone(promise.ponderator)
 
     def test_a_promise_with_no_person(self):
         '''A promise does not necessarily have a person'''
