@@ -47,6 +47,10 @@ class Promise(models.Model):
             self.fulfillment = Fulfillment.objects.create(promise=self)
 
     def __unicode__(self):
+        if self.person is None:
+            return u"Someone promessed {what} with {percentage}%".format(
+                what=self.name,
+                percentage=self.fulfillment.percentage)
         return u"{who} promessed {what} with {percentage}%".format(who=self.person.name, \
                                                                    what=self.name, \
                                                                    percentage=self.fulfillment.percentage)

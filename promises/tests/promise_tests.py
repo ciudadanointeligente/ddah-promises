@@ -31,6 +31,8 @@ class PromiseTestCase(TestCase):
         self.assertEquals(promise.name, "this is a promise")
         self.assertEquals(promise.description, "this is a description")
         self.assertEquals(promise.date, nownow)
+        self.assertEquals(promise.__unicode__(), "Someone promessed this is a promise with 0%")
+
 
     def test_blank_attributes(self):
         ''' A Promise can have some blank attributes'''
