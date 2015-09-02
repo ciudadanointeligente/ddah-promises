@@ -97,6 +97,16 @@ class PromiseTestCase(TestCase):
         self.assertEquals(promise.order, 0)
 
 
+    def test_promises_get_index(self):
+        '''Get index'''
+        promise = Promise.objects.create(name="this is a promise",
+                                         description="this is a description",
+                                         date = nownow,
+                                         ponderator=0.1
+                                         )
+        promise.fulfillment.percentage = 50
+        self.assertEquals(promise.index, 5)
+
     def test_promises_are_ordered(self):
         '''Promises come ordered according to the order field'''
         promise1 = Promise.objects.create(name="promise 1",\
