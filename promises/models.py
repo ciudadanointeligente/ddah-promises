@@ -50,6 +50,8 @@ class Promise(models.Model):
 
     @property
     def index(self):
+        if self.ponderator is None:
+            return None
         return self.fulfillment.percentage * self.ponderator
 
     def __unicode__(self):
