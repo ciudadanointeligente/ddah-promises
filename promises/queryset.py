@@ -1,12 +1,10 @@
 
 from django.db import models
-from django.db.models import Avg
+from django.db.models import Avg, Sum
 
 
 class PromiseSummary(object):
-    def __init__(self, accomplished=0,\
-                 in_progress=0,\
-                 no_progress=0,\
+    def __init__(self, accomplished=0, in_progress=0, no_progress=0,
                  total_progress=0):
         self.accomplished = accomplished
         self.in_progress = in_progress
@@ -24,7 +22,7 @@ class PromiseSummary(object):
     def calculate_percentage(self, number):
         if not self.total:
             return 0
-        return (float(number)/float(self.total))*100
+        return (float(number)/float(self.total)) * 100
 
     @property
     def accomplished_percentage(self):
@@ -42,14 +40,28 @@ class PromiseSummary(object):
 class PromiseQuerySet(models.query.QuerySet):
     def summary(self):
         summary = PromiseSummary()
-        summary.no_progress = self.filter(fulfillment__percentage__exact=0).count()
-        summary.accomplished = self.filter(fulfillment__percentage__exact=100).count()
-        summary.in_progress = self.filter(fulfillment__percentage__range=(1,99)).count()
+        summary.no_progress = self.filter(
+            fulfillment__percentage__exact=0).count()
+        summary.accomplished = self.filter(
+            fulfillment__percentage__exact=100).count()
+        summary.in_progress = self.filter(
+            fulfillment__percentage__range=(1, 99)).count()
         total_progress = 0
+        ponderated = self.exclude(ponderator__isnull=True)
+        not_ponderated = self.filter(ponderator__isnull=True)
+        sum_ponderated = ponderated.aggregate(
+            ponderator_sum=Sum('ponderator')).get('ponderator_sum') or 0
+        default_ponderated = float(1 - sum_ponderated)/float(
+            not_ponderated.count())
+        ponderated_count = 0
         for promise in self.all():
-            total_progress += promise.fulfillment.percentage
+            ponderator = promise.ponderator
+            if promise.ponderator is None:
+                ponderator = default_ponderated
+            total_progress += promise.fulfillment.percentage * ponderator
+            ponderated_count += ponderator
         try:
-            summary.total_progress = float(total_progress)/float(self.count())
+            summary.total_progress = float(total_progress)/ponderated_count
         except ZeroDivisionError:
             summary.total_progress = 0
         return summary
@@ -57,4 +69,6 @@ class PromiseQuerySet(models.query.QuerySet):
 
 class PromiseManager(models.Manager):
     def get_queryset(self):
-        return PromiseQuerySet(self.model, using=self._db).annotate(percentage=Avg('fulfillment__percentage')).order_by('-percentage', 'order')
+        qs = PromiseQuerySet(self.model, using=self._db)
+        return qs.annotate(percentage=Avg('fulfillment__percentage')).order_by(
+            '-percentage', 'order')
