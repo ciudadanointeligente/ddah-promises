@@ -144,59 +144,6 @@ class PromiseQuerysetTestCase(TestCase):
         self.assertEquals(promises[3], promise_4)
         self.assertEquals(promises[4], promise_1)
 
-    @unittest.skip("Is the ordering of the promises really important?\
-                   perhaps I could force the ordering")
-    def test_queryset_ordered_with_ponderator(self):
-        '''If we define ponderator then the ordering is different
-        promise  | ponderator | fulfilment | index
-        -------------------------------------------
-        promise2 |    0.3     |    50      |  15.0
-        promise3 |    0.1     |   100      |  10.0
-        promise5 |    0.1     |    99      |  9.9
-        promise4 |    0.1     |     1      |  0.1
-        promise1 |    0.1     |     0      |  0.0
-        -----------------------------------------
-        Total                     35/0.7   |  50%
-        '''
-
-        promise_1 = Promise.objects.create(name="this is a promise 1",
-                                           category=self.category,
-                                           ponderator=0.1
-                                           )
-        # promises half accomplished
-        promise_2 = Promise.objects.create(name="this is a promise 2",
-                                           category=self.category,
-                                           ponderator=0.3
-                                           )
-        promise_2.fulfillment.percentage = 50
-        promise_2.fulfillment.save()
-        promise_4 = Promise.objects.create(name="this is a promise 4",
-                                           category=self.category,
-                                           ponderator=0.1
-                                           )
-        promise_4.fulfillment.percentage = 1
-        promise_4.fulfillment.save()
-        promise_5 = Promise.objects.create(name="this is a promise 5",
-                                           category=self.category,
-                                           ponderator=0.1
-                                           )
-        promise_5.fulfillment.percentage = 99
-        promise_5.fulfillment.save()
-        # fully acoomplished promises
-        promise_3 = Promise.objects.create(name="this is a promise 3",
-                                           category=self.category,
-                                           ponderator=0.1
-                                           )
-        promise_3.fulfillment.percentage = 100
-        promise_3.fulfillment.save()
-
-        promises = Promise.objects.all()
-        self.assertEquals(promises[0], promise_2)
-        self.assertEquals(promises[1], promise_3)
-        self.assertEquals(promises[2], promise_5)
-        self.assertEquals(promises[3], promise_4)
-        self.assertEquals(promises[4], promise_1)
-
     def test_promises_queryset_with_index(self):
         '''Every promise has an index annotated
         promise  | ponderator | fulfilment | index
