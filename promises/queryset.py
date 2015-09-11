@@ -58,7 +58,10 @@ class PromiseQuerySet(models.query.QuerySet):
             ponderator = promise.ponderator
             if promise.ponderator is None:
                 ponderator = default_ponderated
-            total_progress += promise.fulfillment.percentage * ponderator
+                index = promise.fulfillment.percentage * ponderator
+            else:
+                index = promise.index
+            total_progress += index
             ponderated_count += ponderator
         try:
             summary.total_progress = float(total_progress)/ponderated_count
