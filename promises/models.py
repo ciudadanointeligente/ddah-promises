@@ -70,7 +70,7 @@ class Promise(models.Model):
 class ExternalDocumentMixin(models.Model):
     url = models.URLField()
     display_name = models.CharField(max_length=512)
-    date = models.DateField()
+    date = models.DateField(null=True)
 
     class Meta:
         abstract = True
