@@ -20,7 +20,7 @@ class Category(models.Model):
         for promise in self.promises.all():
             sum_of_percentages += promise.fulfillment.percentage
         try:
-            return sum_of_percentages/self.promises.count()
+            return sum_of_percentages / self.promises.count()
         except ZeroDivisionError:
             return 0
 
