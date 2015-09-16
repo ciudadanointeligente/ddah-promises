@@ -23,6 +23,18 @@ class PromiseTestCase(TestCase):
         self.assertEquals(promise.date, nownow)
         self.assertIsNone(promise.ponderator)
 
+    def test_promise_with_tags(self):
+        promise = Promise.objects.create(name="this is a promise",
+                                         description="this is a description",
+                                         date=nownow,
+                                         person=self.person
+                                         )
+        promise.tags.add("Good!", "Very", "Fiera")
+        self.assertEquals(promise.tags.count(), 3)
+        self.assertEquals(Promise.objects.get(tags__name__contains="Good!"), promise)
+        self.assertEquals(Promise.objects.get(tags__name__contains="Very"), promise)
+        self.assertEquals(Promise.objects.get(tags__name__contains="Fiera"), promise)
+
     def test_a_promise_with_no_person(self):
         '''A promise does not necessarily have a person'''
         promise = Promise.objects.create(name="this is a promise",

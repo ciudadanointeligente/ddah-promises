@@ -41,6 +41,7 @@ setup(
     ],
     install_requires=[
         'django-popolo',
+        'django-taggit',
     ],
     dependency_links=[
         'http://github.com/openpolis/django-popolo/tarball/master#egg=django-popolo'

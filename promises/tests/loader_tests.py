@@ -3,6 +3,7 @@ from django.test import TestCase
 from promises.csv_loader import HeaderReader, PromiseCreator
 from promises.models import Promise, Category, VerificationDocument
 from popolo.models import Identifier
+from unittest import skip
 
 
 class CSVLoaderTestCaseBase(TestCase):
@@ -112,3 +113,9 @@ class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
                                                         url='http://ciudadanoi.org')
         self.assertIsInstance(verification_doc, VerificationDocument)
         self.assertEquals(verification_doc.promise, promise)
+
+    @skip("Promises don't yet have tags")
+    def test_create_a_tag(self):
+        creator = PromiseCreator()
+        creator.get_promise("the new version of the promise")
+

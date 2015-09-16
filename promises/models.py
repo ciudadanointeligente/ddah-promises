@@ -4,6 +4,7 @@ from autoslug import AutoSlugField
 from .queryset import PromiseManager
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes import generic
+from taggit.managers import TaggableManager
 
 
 class Category(models.Model):
@@ -37,6 +38,7 @@ class Promise(models.Model):
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
     ponderator = models.FloatField(default=None, null=True, blank=True)
     identifiers = generic.GenericRelation(Identifier, help_text="Issued identifiers")
+    tags = TaggableManager()
 
     objects = PromiseManager()
 
