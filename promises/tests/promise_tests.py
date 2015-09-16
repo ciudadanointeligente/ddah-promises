@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils.timezone import now
 from ..models import Promise, Fulfillment, Category
-from popolo.models import Person
+from popolo.models import Person, Identifier
 
 nownow = now()
 
@@ -97,6 +97,18 @@ promise with 0%")
                                          person=self.person
                                          )
         self.assertEquals(promise.order, 0)
+
+    def test_promise_with_identifier(self):
+        promise = Promise.objects.create(name="this is a promise",
+                                         description="this is a description",
+                                         date=nownow,
+                                         )
+        i = Identifier.objects.create(identifier="P1")
+        i2 = Identifier.objects.create(identifier="Buena onda")
+        promise.identifiers.add(i)
+        promise.identifiers.add(i2)
+        self.assertIn(i, promise.identifiers.all())
+        self.assertIn(i2, promise.identifiers.all())
 
     def test_promises_get_index(self):
         '''Get index'''

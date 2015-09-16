@@ -1,8 +1,9 @@
 from django.db import models
-from popolo.models import Person
+from popolo.models import Person, Identifier
 from autoslug import AutoSlugField
 from .queryset import PromiseManager
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.contenttypes import generic
 
 
 class Category(models.Model):
@@ -35,6 +36,7 @@ class Promise(models.Model):
     category = models.ForeignKey(Category, related_name="promises", null=True)
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
     ponderator = models.FloatField(default=None, null=True, blank=True)
+    identifiers = generic.GenericRelation(Identifier, help_text="Issued identifiers")
 
     objects = PromiseManager()
 
