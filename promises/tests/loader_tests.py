@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
 from promises.csv_loader import HeaderReader, PromiseCreator
-from ..models import Promise, Category
+from promises.models import Promise, Category, VerificationDocument
+from popolo.models import Identifier
 
 
 class CSVLoaderTestCaseBase(TestCase):
@@ -91,3 +92,23 @@ class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
         self.assertEquals(promise.ponderator, 0.04)
         self.assertEquals(promise.fulfillment.percentage, 10)
         self.assertTrue(promise.identifiers.filter(identifier=self.row[0]))
+
+    def test_get_promise_by_identifier_not_by_name(self):
+        p = Promise.objects.create(name="This is a promise")
+        i = Identifier.objects.create(identifier="i1")
+        p.identifiers.add(i)
+
+        creator = PromiseCreator()
+        promise = creator.get_promise("the new version of the promise",
+                                      identifier="i1")
+
+        self.assertEquals(p, promise)
+
+    def test_create_verification_document(self):
+        creator = PromiseCreator()
+        promise = creator.get_promise("the new version of the promise",
+                                      identifier="i1")
+        verification_doc = creator.get_verification_doc(name="the_name",
+                                                        url='http://ciudadanoi.org')
+        self.assertIsInstance(verification_doc, VerificationDocument)
+        self.assertEquals(verification_doc.promise, promise)
