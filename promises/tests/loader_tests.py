@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
-from promises.csv_loader import HeaderReader, PromiseCreator
+from promises.csv_loader import HeaderReader, PromiseCreator, match_with
 from promises.models import Promise, Category, VerificationDocument
 from popolo.models import Identifier
-from unittest import skip
 
 
 class CSVLoaderTestCaseBase(TestCase):
@@ -41,7 +40,43 @@ class HeaderReaderTestCase(CSVLoaderTestCaseBase):
     def test_instanciate_header_reader(self):
         '''I can instanciate a header reader'''
         reader = HeaderReader(headers=self.headers)
-        self.assertTrue(reader)
+        self.assertTrue(hasattr(reader, 'instructions'))
+        self.assertIsInstance(reader.instructions, dict)
+        key, instruction = reader.what_to_do_with_column(0)
+        self.assertEquals(key, 'promise_kwarg')
+        self.assertEquals(instruction, 'identifier')
+        #  Create category
+        key, instruction = reader.what_to_do_with_column(1)
+        self.assertEquals(key, 'promise_kwarg')
+        self.assertEquals(instruction, 'category')
+        #  Create category
+        key, instruction = reader.what_to_do_with_column(2)
+        self.assertEquals(key, 'promise_kwarg')
+        self.assertEquals(instruction, 'promess')
+        #  Description
+        key, instruction = reader.what_to_do_with_column(3)
+        self.assertEquals(key, 'promise_kwarg')
+        self.assertEquals(instruction, 'description')
+        #  Quality
+        key, instruction = reader.what_to_do_with_column(5)
+        self.assertEquals(key, 'promise_kwarg')
+        self.assertEquals(instruction, 'fulfillment')
+        #  Fulfillment
+        key, instruction = reader.what_to_do_with_column(6)
+        self.assertEquals(key, 'promise_kwarg')
+        self.assertEquals(instruction, 'ponderator')
+        # Verification doc
+        key, instruction = reader.what_to_do_with_column(7)
+        self.assertEquals(key, 'create_verification_doc')
+
+        self.assertEquals(instruction['match_with'], 'verification_doc_link_1')
+        self.assertEquals(instruction['use_other_as'], 'url')
+        self.assertEquals(instruction['use_this_as'], 'name')
+
+    def test_match_with_method(self):
+        key = 'verification_doc_1'
+        result = match_with('verification_doc_link_', key)
+        self.assertEquals(result, 'verification_doc_link_1')
 
 
 class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
@@ -114,8 +149,9 @@ class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
         self.assertIsInstance(verification_doc, VerificationDocument)
         self.assertEquals(verification_doc.promise, promise)
 
-    @skip("Promises don't yet have tags")
     def test_create_a_tag(self):
         creator = PromiseCreator()
         creator.get_promise("the new version of the promise")
+        creator.add_tag("perro")
+        self.assertTrue(creator.promise.tags.all())
 
