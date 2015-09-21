@@ -51,22 +51,22 @@ def match_with(first_part, key):
     return first_part + str(pattern.search(key).group('id'))
 
 
-HEADER_TYPES = {'id': {'what': 'promise_kwarg', 'as': 'identifier'},
-                'category': {'what': 'promise_kwarg'},
-                'promess': {'what': 'promise_kwarg'},
-                'description': {'what': 'promise_kwarg'},
-                'quality': {'what': 'promise_kwarg'},
-                'fulfillment': {'what': 'promise_kwarg'},
-                'ponderator': {'what': 'promise_kwarg'},
-                'verification_doc_name_(?P<id>\d+)': {'what': 'create_verification_doc',
+HEADER_TYPES = {'id': {'what': 'create_promise_kwarg', 'as': 'identifier'},
+                'category': {'what': 'create_promise_kwarg'},
+                'promess': {'what': 'create_promise_kwarg'},
+                'description': {'what': 'create_promise_kwarg'},
+                'quality': {'what': 'create_promise_kwarg'},
+                'fulfillment': {'what': 'create_promise_kwarg'},
+                'ponderator': {'what': 'create_promise_kwarg'},
+                'verification_doc_name_(?P<id>\d+)': {'what': 'create_verification_doc_kwarg',
                                                       'match': 'verification_doc_link_',
                                                       'use_this_as': 'name',
                                                       'use_other_as': 'url'
                                                       },
-                'verification_doc_link_(?P<id>\d+)': {'what': 'promise_kwarg'},
-                'information_source_name_(?P<id>\d+)': {'what': 'promise_kwarg'},
-                'information_source_link_(?P<id>\d+)': {'what': 'promise_kwarg'},
-                'tag': {'what': 'promise_kwarg'},
+                'verification_doc_link_(?P<id>\d+)': {'what': 'create_promise_kwarg'},
+                'information_source_name_(?P<id>\d+)': {'what': 'create_promise_kwarg'},
+                'information_source_link_(?P<id>\d+)': {'what': 'create_promise_kwarg'},
+                'tag': {'what': 'create_promise_kwarg'},
 }
 
 
