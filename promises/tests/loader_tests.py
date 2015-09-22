@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
-from promises.csv_loader import HeaderReader, PromiseCreator, match_with
-from promises.models import Promise, Category, VerificationDocument
+from promises.csv_loader import HeaderReader, PromiseCreator, match_with, RowProcessor
+from promises.models import Promise, Category, VerificationDocument, InformationSource
 from popolo.models import Identifier
+import types
 
 
 class CSVLoaderTestCaseBase(TestCase):
@@ -39,6 +40,8 @@ class CSVLoaderTestCaseBase(TestCase):
                     'vf_name2',  # verification_doc_name_2
                     'http://verification.doc2',  # verification_doc_link_2
                     ]
+
+        self.rows = [self.headers, self.row]
 
 
 class HeaderReaderTestCase(CSVLoaderTestCaseBase):
@@ -107,6 +110,19 @@ class HeaderReaderTestCase(CSVLoaderTestCaseBase):
         self.assertEquals(columns[0],'identifier')
         self.assertIn(7, reader.verification_doc_kwarg.keys())
 
+    def test_get_the_creation_order(self):
+        reader = HeaderReader(headers=self.headers)
+        order = reader.get_creation_instructions()
+        self.assertEquals(order[0], {'creation_method': 'create_promise',
+                                     'kwargs_getter': 'get_promise_kwargs',
+                                     'multiple': False})
+        self.assertEquals(order[1], {'creation_method': 'create_verification_doc',
+                                     'kwargs_getter': 'get_verification_doc_kwargs',
+                                     'multiple': True})
+        self.assertEquals(order[2], {'creation_method': 'create_information_source',
+                                     'kwargs_getter': 'get_information_source_kwargs',
+                                     'multiple': True})
+
     def test_get_creation_kwargs(self):
         reader = HeaderReader(headers=self.headers)
         kwargs = reader.get_promise_kwargs(self.row)
@@ -146,6 +162,15 @@ class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
 
         self.assertIsInstance(creator.category, Category)
         self.assertEquals(creator.category.name, self.row[1])
+
+    def test_create_information_source(self):
+        creator = PromiseCreator()
+        promise = creator.create_promise("the new version of the promise",
+                                         identifier="i1")
+        information_source = creator.create_information_source(name="the_name",
+                                                               url='http://ciudadanoi.org')
+        self.assertIsInstance(information_source, InformationSource)
+        self.assertEquals(information_source.promise, promise)
 
     def test_create_promise(self):
         creator = PromiseCreator()
@@ -211,4 +236,74 @@ class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
         creator.create_promise("the new version of the promise")
         creator.create_tag("perro")
         self.assertTrue(creator.promise.tags.all())
+
+class FakeProcessor():
+    def __init__(self):
+        self.instructions = []
+
+    def __getattr__(self, name):
+        dicti = {}
+        dicti['name'] = name
+        dicti['kwargs'] = None
+        dicti['args'] = None
+        dicti['called'] = False
+        self.instructions.append(dicti)
+        def make_method(n):
+            def f(self, *args, **kwargs):
+                counter = 0
+                for i in self.instructions:
+                    if i['name'] == n:
+                        self.instructions[counter]['kwargs'] = kwargs
+                        self.instructions[counter]['args'] = args
+                        self.instructions[counter]['called'] = True
+                    counter += 1
+            return f
+        the_method = types.MethodType(make_method(name), self)
+        setattr(self, name, the_method)
+        return the_method
+
+        '''
+        ### This
+        p = FakeProcessor()
+        p.create_promise(perrito="fiera")
+        print p.instructions
+        ### Will print
+        {'create_promise': {'args': (), 'kwargs': {'perrito': 'fiera'}}}
+        '''
+
+class RowProcessorTestCase(CSVLoaderTestCaseBase):
+    def test_given_a_row_it_processes_using_the_header_reader(self):
+        processor = RowProcessor(self.rows)
+        self.assertEquals(processor.header_reader.headers, self.headers)
+        self.assertEquals(processor.rows[0], self.row)
+
+    def test_fake_processor(self):
+        p = FakeProcessor()
+        p.create_promise(perrito="fiera")
+        instructions = p.instructions
+        self.assertEquals('create_promise', instructions[0]['name'])
+        self.assertTrue(instructions[0]['called'])
+        self.assertEquals({'perrito': 'fiera'}, instructions[0]['kwargs'])
+
+    def test_the_order_in_which_the_creation_is_performed(self):
+        processor = RowProcessor(self.rows, creator_class=FakeProcessor)
+        processor.read_row(self.rows[1])
+        i = processor.creator.instructions
+        self.assertEquals(i[0]['name'], 'create_promise')
+        self.assertTrue(i[0]['called'])
+        self.assertEquals(i[1]['name'], 'create_verification_doc')
+        self.assertTrue(i[1]['called'])
+        self.assertEquals(i[2]['name'], 'create_information_source')
+        self.assertTrue(i[2]['called'])
+
+    def test_read_rows(self):
+        processor = RowProcessor(self.rows, creator_class=FakeProcessor)
+        processor.process()
+        i = processor.creator.instructions
+        self.assertEquals(i[0]['name'], 'create_promise')
+        self.assertTrue(i[0]['called'])
+        self.assertEquals(i[1]['name'], 'create_verification_doc')
+        self.assertTrue(i[1]['called'])
+        self.assertEquals(i[2]['name'], 'create_information_source')
+        self.assertTrue(i[2]['called'])
 

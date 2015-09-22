@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from promises.models import Promise, Category, VerificationDocument
+from promises.models import Promise, Category, VerificationDocument, InformationSource
 from popolo.models import Identifier
 import re
 import copy
@@ -44,6 +44,12 @@ class PromiseCreator():
         verification_doc.save()
         return verification_doc
 
+    def create_information_source(self, name, url):
+        information_source, created = InformationSource.objects.get_or_create(promise=self.promise, display_name=name)
+        information_source.url = url
+        information_source.save()
+        return information_source
+
     def create_tag(self, tag):
         self.promise.tags.add(tag)
 
@@ -72,7 +78,14 @@ HEADER_TYPES = {'id': {'what': 'promise_kwarg', 'as': 'identifier'},
                                                       },
                 'tag': {'what': 'create_tag_arg'},
 }
-
+CREATION_ORDER = [{'name': 'promise',
+                   'multiple': False},
+                  {'name': 'verification_doc',
+                   'multiple': True
+                   },
+                  {'name': 'information_source',
+                   'multiple': True
+                   }]
 
 class HeaderReader():
     def __init__(self, headers=None):
@@ -93,6 +106,16 @@ class HeaderReader():
                     return f
                 setattr(self, "get_" + key + "s", types.MethodType(make_get_kwargs(key), self))
             self.instructions[key][column_number] = instruction
+
+    def get_creation_instructions(self):
+        order = []
+        for item in CREATION_ORDER:
+            instruction = {}
+            instruction['creation_method'] = 'create_' + item['name']
+            instruction['kwargs_getter'] = 'get_' + item['name'] + '_kwargs'
+            instruction['multiple'] = item['multiple']
+            order.append(instruction)
+        return order
 
     def get_kwargs_for(self, dictionary, row):
         kwargs = {}
@@ -122,3 +145,26 @@ class HeaderReader():
                     instruction = raw_instructions
                 return HEADER_TYPES[key]['what'], instruction
 
+class RowProcessor():
+    def __init__(self, rows, reader_class=HeaderReader, creator_class=PromiseCreator):
+        self.reader_class = reader_class
+        self.creator_class = creator_class
+        self.creator = self.creator_class()
+        self.header_reader = self.reader_class(rows[0])
+        self.rows = rows[1:]
+
+    def read_row(self, row):
+        order = self.header_reader.get_creation_instructions()
+        for instruction in order:
+            getter = getattr(self.header_reader, instruction['kwargs_getter'])
+            kwargs = getter(row)
+            creator_method = getattr(self.creator, instruction['creation_method'])
+            if instruction['multiple']:
+                for index in kwargs:
+                    creator_method(**kwargs[index])
+            else:
+                creator_method(**kwargs)
+
+    def process(self):
+        for row in self.rows:
+            self.read_row(row)
