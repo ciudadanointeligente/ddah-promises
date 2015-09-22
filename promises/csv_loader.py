@@ -2,6 +2,7 @@
 from promises.models import Promise, Category, VerificationDocument
 from popolo.models import Identifier
 import re
+import copy
 
 
 class PromiseCreator():
@@ -12,7 +13,7 @@ class PromiseCreator():
         self.category, created = Category.objects.get_or_create(name=category_name)
         return self.category
 
-    def get_promise(self, promise_name, **kwargs):
+    def create_promise(self, promise_name, **kwargs):
         search_key = {
             'name': promise_name
         }
@@ -35,14 +36,14 @@ class PromiseCreator():
         self.promise.save()
         return self.promise
 
-    def get_verification_doc(self, name, url):
+    def create_verification_doc(self, name, url):
         verification_doc, created = VerificationDocument.objects.get_or_create(display_name=name)
         verification_doc.url = url
         verification_doc.promise = self.promise
         verification_doc.save()
         return verification_doc
 
-    def add_tag(self, tag):
+    def create_tag(self, tag):
         self.promise.tags.add(tag)
 
 
@@ -53,7 +54,7 @@ def match_with(first_part, key):
 
 HEADER_TYPES = {'id': {'what': 'create_promise_kwarg', 'as': 'identifier'},
                 'category': {'what': 'create_promise_kwarg'},
-                'promess': {'what': 'create_promise_kwarg'},
+                'promess': {'what': 'create_promise_kwarg', 'as': 'name'},
                 'description': {'what': 'create_promise_kwarg'},
                 'quality': {'what': 'create_promise_kwarg'},
                 'fulfillment': {'what': 'create_promise_kwarg'},
@@ -63,10 +64,12 @@ HEADER_TYPES = {'id': {'what': 'create_promise_kwarg', 'as': 'identifier'},
                                                       'use_this_as': 'name',
                                                       'use_other_as': 'url'
                                                       },
-                'verification_doc_link_(?P<id>\d+)': {'what': 'create_promise_kwarg'},
-                'information_source_name_(?P<id>\d+)': {'what': 'create_promise_kwarg'},
-                'information_source_link_(?P<id>\d+)': {'what': 'create_promise_kwarg'},
-                'tag': {'what': 'create_promise_kwarg'},
+                'information_source_name_(?P<id>\d+)': {'what': 'create_information_source_kwarg',
+                                                      'match': 'information_source_link_',
+                                                      'use_this_as': 'name',
+                                                      'use_other_as': 'url'
+                                                      },
+                'tag': {'what': 'create_tag_arg'},
 }
 
 
@@ -75,17 +78,54 @@ class HeaderReader():
         self.headers = headers
         self.instructions = {}
 
+        for column_number in range(len(self.headers)):
+            key_and_instruction = self.what_to_do_with_column(column_number)
+            if key_and_instruction is None:
+                continue
+            key, instruction = key_and_instruction
+            if key not in self.instructions.keys():
+                self.instructions[key] = {}
+                setattr(self, key, self.instructions[key])
+            self.instructions[key][column_number] = instruction
+
+    def get_kwargs_for(self, dictionary, row):
+        kwargs = {}
+        for key in dictionary.keys():
+            instruction = dictionary[key]
+            if isinstance(dictionary[key], dict):
+                kwargs[key] = {}
+                kwargs[key][instruction['use_this_as']] = row[key]
+                other_index = self.headers.index(instruction['match_with'])
+                kwargs[key][instruction['use_other_as']] = row[other_index]
+            else:
+                kwargs[self.create_promise_kwarg[key]] = row[key]
+        return kwargs
+
+    def get_promise_creation_kwargs(self, row):
+        return self.get_kwargs_for(self.create_promise_kwarg, row)
+        kwargs = {}
+        for key in self.create_promise_kwarg.keys():
+            kwargs[self.create_promise_kwarg[key]] = row[key]
+        return kwargs
+
+    def get_verification_doc_kwargs(self, row):
+        return self.get_kwargs_for(self.create_verification_doc_kwarg, row)
+
+    def get_information_source_kwargs(self, row):
+        return self.get_kwargs_for(self.create_information_source_kwarg, row)
+
     def what_to_do_with_column(self, column_number):
         for key in HEADER_TYPES.keys():
             pattern = re.compile(key)
             if pattern.search(self.headers[column_number]):
                 instruction_alias = self.headers[column_number]
                 instruction = instruction_alias
-                raw_instructions = HEADER_TYPES[key]
+                raw_instructions = copy.copy(HEADER_TYPES[key])
                 if 'as' in raw_instructions.keys():
                     instruction = raw_instructions['as']
                 if 'match' in raw_instructions.keys():
-                    raw_instructions['match_with'] = match_with(raw_instructions['match'], instruction_alias)
+                    the_match =  match_with(raw_instructions['match'], instruction_alias)
+                    raw_instructions['match_with'] = the_match
                     instruction = raw_instructions
                 return HEADER_TYPES[key]['what'], instruction
 

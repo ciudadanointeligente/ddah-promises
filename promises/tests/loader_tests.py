@@ -19,7 +19,10 @@ class CSVLoaderTestCaseBase(TestCase):
                         'information_source_name_1',
                         'information_source_link_1',
                         'tag',
-                        'tag']
+                        'tag',
+                        'verification_doc_name_2',
+                        'verification_doc_link_2',
+                        ]
         self.row = ['1',  # Identifier
                     'Probidad y fortalecimiento de Municipios',  # category
                     'Plan gradual de capacitación y profesionalización del personal y seleccionar profesionales en unidades clave con asesoría de la ADP.',  # promise
@@ -27,12 +30,14 @@ class CSVLoaderTestCaseBase(TestCase):
                     '7,0',  # quality
                     '10',  # fulfillment
                     '0.040',  # ponderator
-                    '',  # verification_doc_name_1
-                    '',  # verification_doc_link_1
-                    '',  # information_source_name_1
-                    '',  # information_source_link_1
+                    'vf_name',  # verification_doc_name_1
+                    'http://verification.doc',  # verification_doc_link_1
+                    'is_name',  # information_source_name_1
+                    'http://information.source',  # information_source_link_1
                     '',  # tag
                     '',  # tag
+                    'vf_name2',  # verification_doc_name_2
+                    'http://verification.doc2',  # verification_doc_link_2
                     ]
 
 
@@ -52,7 +57,7 @@ class HeaderReaderTestCase(CSVLoaderTestCaseBase):
         #  Create category
         key, instruction = reader.what_to_do_with_column(2)
         self.assertEquals(key, 'create_promise_kwarg')
-        self.assertEquals(instruction, 'promess')
+        self.assertEquals(instruction, 'name')
         #  Description
         key, instruction = reader.what_to_do_with_column(3)
         self.assertEquals(key, 'create_promise_kwarg')
@@ -69,9 +74,61 @@ class HeaderReaderTestCase(CSVLoaderTestCaseBase):
         key, instruction = reader.what_to_do_with_column(7)
         self.assertEquals(key, 'create_verification_doc_kwarg')
 
+        self.assertIsNone(reader.what_to_do_with_column(8))
+
         self.assertEquals(instruction['match_with'], 'verification_doc_link_1')
         self.assertEquals(instruction['use_other_as'], 'url')
         self.assertEquals(instruction['use_this_as'], 'name')
+        # Verification doc 2
+        key, instruction = reader.what_to_do_with_column(13)
+        self.assertEquals(key, 'create_verification_doc_kwarg')
+
+        self.assertIsNone(reader.what_to_do_with_column(14))
+
+        self.assertEquals(instruction['match_with'], 'verification_doc_link_2')
+        self.assertEquals(instruction['use_other_as'], 'url')
+        # Information source
+        key, instruction = reader.what_to_do_with_column(9)
+        self.assertEquals(key, 'create_information_source_kwarg')
+
+        self.assertEquals(instruction['match_with'], 'information_source_link_1')
+        self.assertEquals(instruction['use_other_as'], 'url')
+        self.assertEquals(instruction['use_this_as'], 'name')
+        #  Tags
+        key, instruction = reader.what_to_do_with_column(11)
+        self.assertEquals(key, 'create_tag_arg')
+        self.assertEquals(instruction, 'tag')
+
+    def test_get_what_columns_to_read_to_get_promise_creation_kwargs(self):
+        reader = HeaderReader(headers=self.headers)
+
+        columns = reader.create_promise_kwarg
+
+        self.assertEquals(columns[0],'identifier')
+        self.assertIn(7, reader.create_verification_doc_kwarg.keys())
+
+    def test_get_creation_kwargs(self):
+        reader = HeaderReader(headers=self.headers)
+        kwargs = reader.get_promise_creation_kwargs(self.row)
+        self.assertEquals(kwargs['identifier'], '1')
+        self.assertEquals(kwargs['category'], 'Probidad y fortalecimiento de Municipios')
+        self.assertEquals(kwargs['name'],'Plan gradual de capacitación y profesionalización del personal y seleccionar profesionales en unidades clave con asesoría de la ADP.') # description
+        self.assertEquals(kwargs['quality'], '7,0')  # quality
+        self.assertEquals(kwargs['fulfillment'], '10')  # fulfillment
+        self.assertEquals(kwargs['ponderator'], '0.040')  # ponderator
+
+        kwargs = reader.get_information_source_kwargs(self.row)
+        self.assertEquals(kwargs[9]['name'], 'is_name')  # information_source_name_1
+        self.assertEquals(kwargs[9]['url'], 'http://information.source')  # information_source_link_1
+
+        kwargs = reader.get_verification_doc_kwargs(self.row)
+        self.assertEquals(2, len(kwargs))
+        first_kwargs = kwargs[7]
+        self.assertEquals(first_kwargs['name'], 'vf_name')  # verification_doc_name_1
+        self.assertEquals(first_kwargs['url'], 'http://verification.doc')  # verification_doc_link_1
+        second_kwargs = kwargs[13]
+        self.assertEquals(second_kwargs['name'], 'vf_name2')  # verification_doc_name_1
+        self.assertEquals(second_kwargs['url'], 'http://verification.doc2')  # verification_doc_link_1
 
     def test_match_with_method(self):
         key = 'verification_doc_1'
@@ -93,7 +150,7 @@ class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
     def test_create_promise(self):
         creator = PromiseCreator()
         creator.get_category(self.row[1])
-        promise = creator.get_promise(self.row[2])
+        promise = creator.create_promise(self.row[2])
         self.assertIsInstance(promise, Promise)
         self.assertEquals(promise.name, self.row[2])
         self.assertEquals(promise, creator.promise)
@@ -101,29 +158,29 @@ class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
 
         # Without category
         creator = PromiseCreator()
-        promise = creator.get_promise(self.row[2])
+        promise = creator.create_promise(self.row[2])
         self.assertIsNone(promise.category)
 
         # With description
         creator = PromiseCreator()
-        promise = creator.get_promise(self.row[2], description=u"la fiera es la mejor")
+        promise = creator.create_promise(self.row[2], description=u"la fiera es la mejor")
         self.assertEquals(promise.description, u"la fiera es la mejor")
 
         # With category and description
         creator = PromiseCreator()
         creator.get_category(self.row[1])
-        promise = creator.get_promise(self.row[2], description=u"la fiera es la mejor")
+        promise = creator.create_promise(self.row[2], description=u"la fiera es la mejor")
         self.assertEquals(promise.category, creator.category)
         self.assertEquals(promise.description, u"la fiera es la mejor")
 
         # working with kwargs
         creator = PromiseCreator()
-        promise = creator.get_promise(self.row[2],
-                                      description=u"la fiera es la mejor",
-                                      quality=self.row[4],
-                                      fulfillment=self.row[5],
-                                      ponderator=self.row[6],
-                                      identifier=self.row[0])
+        promise = creator.create_promise(self.row[2],
+                                         description=u"la fiera es la mejor",
+                                         quality=self.row[4],
+                                         fulfillment=self.row[5],
+                                         ponderator=self.row[6],
+                                         identifier=self.row[0])
         promise = Promise.objects.get(id=promise.id)
         self.assertEquals(promise.ponderator, 0.04)
         self.assertEquals(promise.fulfillment.percentage, 10)
@@ -135,23 +192,23 @@ class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
         p.identifiers.add(i)
 
         creator = PromiseCreator()
-        promise = creator.get_promise("the new version of the promise",
-                                      identifier="i1")
+        promise = creator.create_promise("the new version of the promise",
+                                         identifier="i1")
 
         self.assertEquals(p, promise)
 
     def test_create_verification_document(self):
         creator = PromiseCreator()
-        promise = creator.get_promise("the new version of the promise",
-                                      identifier="i1")
-        verification_doc = creator.get_verification_doc(name="the_name",
+        promise = creator.create_promise("the new version of the promise",
+                                         identifier="i1")
+        verification_doc = creator.create_verification_doc(name="the_name",
                                                         url='http://ciudadanoi.org')
         self.assertIsInstance(verification_doc, VerificationDocument)
         self.assertEquals(verification_doc.promise, promise)
 
     def test_create_a_tag(self):
         creator = PromiseCreator()
-        creator.get_promise("the new version of the promise")
-        creator.add_tag("perro")
+        creator.create_promise("the new version of the promise")
+        creator.create_tag("perro")
         self.assertTrue(creator.promise.tags.all())
 
