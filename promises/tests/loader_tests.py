@@ -48,31 +48,31 @@ class HeaderReaderTestCase(CSVLoaderTestCaseBase):
         self.assertTrue(hasattr(reader, 'instructions'))
         self.assertIsInstance(reader.instructions, dict)
         key, instruction = reader.what_to_do_with_column(0)
-        self.assertEquals(key, 'create_promise_kwarg')
+        self.assertEquals(key, 'promise_kwarg')
         self.assertEquals(instruction, 'identifier')
         #  Create category
         key, instruction = reader.what_to_do_with_column(1)
-        self.assertEquals(key, 'create_promise_kwarg')
+        self.assertEquals(key, 'promise_kwarg')
         self.assertEquals(instruction, 'category')
         #  Create category
         key, instruction = reader.what_to_do_with_column(2)
-        self.assertEquals(key, 'create_promise_kwarg')
+        self.assertEquals(key, 'promise_kwarg')
         self.assertEquals(instruction, 'name')
         #  Description
         key, instruction = reader.what_to_do_with_column(3)
-        self.assertEquals(key, 'create_promise_kwarg')
+        self.assertEquals(key, 'promise_kwarg')
         self.assertEquals(instruction, 'description')
         #  Quality
         key, instruction = reader.what_to_do_with_column(5)
-        self.assertEquals(key, 'create_promise_kwarg')
+        self.assertEquals(key, 'promise_kwarg')
         self.assertEquals(instruction, 'fulfillment')
         #  Fulfillment
         key, instruction = reader.what_to_do_with_column(6)
-        self.assertEquals(key, 'create_promise_kwarg')
+        self.assertEquals(key, 'promise_kwarg')
         self.assertEquals(instruction, 'ponderator')
         # Verification doc
         key, instruction = reader.what_to_do_with_column(7)
-        self.assertEquals(key, 'create_verification_doc_kwarg')
+        self.assertEquals(key, 'verification_doc_kwarg')
 
         self.assertIsNone(reader.what_to_do_with_column(8))
 
@@ -81,7 +81,7 @@ class HeaderReaderTestCase(CSVLoaderTestCaseBase):
         self.assertEquals(instruction['use_this_as'], 'name')
         # Verification doc 2
         key, instruction = reader.what_to_do_with_column(13)
-        self.assertEquals(key, 'create_verification_doc_kwarg')
+        self.assertEquals(key, 'verification_doc_kwarg')
 
         self.assertIsNone(reader.what_to_do_with_column(14))
 
@@ -89,7 +89,7 @@ class HeaderReaderTestCase(CSVLoaderTestCaseBase):
         self.assertEquals(instruction['use_other_as'], 'url')
         # Information source
         key, instruction = reader.what_to_do_with_column(9)
-        self.assertEquals(key, 'create_information_source_kwarg')
+        self.assertEquals(key, 'information_source_kwarg')
 
         self.assertEquals(instruction['match_with'], 'information_source_link_1')
         self.assertEquals(instruction['use_other_as'], 'url')
@@ -102,14 +102,14 @@ class HeaderReaderTestCase(CSVLoaderTestCaseBase):
     def test_get_what_columns_to_read_to_get_promise_creation_kwargs(self):
         reader = HeaderReader(headers=self.headers)
 
-        columns = reader.create_promise_kwarg
+        columns = reader.promise_kwarg
 
         self.assertEquals(columns[0],'identifier')
-        self.assertIn(7, reader.create_verification_doc_kwarg.keys())
+        self.assertIn(7, reader.verification_doc_kwarg.keys())
 
     def test_get_creation_kwargs(self):
         reader = HeaderReader(headers=self.headers)
-        kwargs = reader.get_promise_creation_kwargs(self.row)
+        kwargs = reader.get_promise_kwargs(self.row)
         self.assertEquals(kwargs['identifier'], '1')
         self.assertEquals(kwargs['category'], 'Probidad y fortalecimiento de Municipios')
         self.assertEquals(kwargs['name'],'Plan gradual de capacitación y profesionalización del personal y seleccionar profesionales en unidades clave con asesoría de la ADP.') # description
