@@ -4,13 +4,22 @@ from popolo.models import Identifier
 
 
 class PromiseCreator():
-    def __init__(self, **kwargs):
+    def __init__(self,
+                 category_qs=Category.objects.all(),
+                 promise_qs=Promise.objects.all(),
+                 verification_doc_qs = VerificationDocument.objects.all(),
+                 information_source_qs = InformationSource.objects.all(),
+                 **kwargs):
         self.category = None
         self.kwargs = kwargs
+        self.category_qs = category_qs
+        self.promise_qs = promise_qs
+        self.verification_doc_qs = verification_doc_qs
+        self.information_source_qs = information_source_qs
         self.warnings = []
 
     def get_category(self, category_name):
-        self.category, created = Category.objects.get_or_create(name=category_name)
+        self.category, created = self.category_qs.get_or_create(name=category_name)
         return self.category
 
     def filter_promise_kwargs(self, kwargs):
@@ -42,7 +51,7 @@ class PromiseCreator():
         if 'category' in kwargs:
             self.get_category(kwargs['category'])
             del kwargs['category']
-        self.promise, created = Promise.objects.get_or_create(**search_key)
+        self.promise, created = self.promise_qs.get_or_create(**search_key)
         for key, value in kwargs.items():
             if key == 'fulfillment':
                 self.promise.fulfillment.percentage = value
@@ -58,14 +67,14 @@ class PromiseCreator():
         return self.promise
 
     def create_verification_doc(self, name, url):
-        verification_doc, created = VerificationDocument.objects.get_or_create(display_name=name)
+        verification_doc, created = self.verification_doc_qs.get_or_create(display_name=name)
         verification_doc.url = url
         verification_doc.promise = self.promise
         verification_doc.save()
         return verification_doc
 
     def create_information_source(self, name, url):
-        information_source, created = InformationSource.objects.get_or_create(promise=self.promise, display_name=name)
+        information_source, created = self.information_source_qs.get_or_create(promise=self.promise, display_name=name)
         information_source.url = url
         information_source.save()
         return information_source
