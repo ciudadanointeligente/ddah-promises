@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
-from promises.csv_loader import HeaderReader, PromiseCreator, match_with, RowProcessor
+from promises.csv_loader import HeaderReader, PromiseCreator, match_with, RowProcessor, CsvProcessor
 from promises.models import Promise, Category, VerificationDocument, InformationSource
 from popolo.models import Identifier
 import types
+from django.core.management import call_command
+import os
+import codecs
 
 
 class CSVLoaderTestCaseBase(TestCase):
@@ -42,6 +45,29 @@ class CSVLoaderTestCaseBase(TestCase):
                     ]
 
         self.rows = [self.headers, self.row]
+
+
+class CSVCommandTestCase(CSVLoaderTestCaseBase):
+    def setUp(self):
+        super(CSVCommandTestCase, self).setUp()
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        self.csv_file = os.path.join(current_dir, 'fixtures', 'example_data.csv')
+
+    def test_csv_processor(self):
+        file_ = codecs.open(self.csv_file)
+        processor = CsvProcessor(file_)
+        processor.work()
+        self.assertTrue(Promise.objects.all())
+        self.assertTrue(Category.objects.all())
+        self.assertTrue(VerificationDocument.objects.all())
+        self.assertTrue(InformationSource.objects.all())
+
+    def test_call_command(self):
+        call_command('csv_promises_importer', self.csv_file)
+        self.assertTrue(Promise.objects.all())
+        self.assertTrue(Category.objects.all())
+        self.assertTrue(VerificationDocument.objects.all())
+        self.assertTrue(InformationSource.objects.all())
 
 
 class HeaderReaderTestCase(CSVLoaderTestCaseBase):
@@ -163,6 +189,13 @@ class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
         self.assertIsInstance(creator.category, Category)
         self.assertEquals(creator.category.name, self.row[1])
 
+    def test_create_promise_and_category(self):
+        creator = PromiseCreator()
+        creator.create_promise(name=self.row[2], category=self.row[1])
+        category = Category.objects.get()
+        self.assertEquals(category.name, self.row[1])
+
+
     def test_create_information_source(self):
         creator = PromiseCreator()
         promise = creator.create_promise("the new version of the promise",
@@ -172,10 +205,36 @@ class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
         self.assertIsInstance(information_source, InformationSource)
         self.assertEquals(information_source.promise, promise)
 
+
+    def test_promise_filter_kwargs(self):
+        creator = PromiseCreator()
+        kwargs = {'category': u'Probidad y fortalecimiento de Municipios',
+                  'name': u'Plan gradual de capacitaci\xf3n y profesionalizaci\xf3n del pa de la ADP.',
+                  'fulfillment': u'0%',
+                  'ponderator': u'0,040%',
+                  'identifier': u'1',
+                  'quality': u'0,0',
+                  'description': u''}
+
+        new_kwargs = creator.filter_promise_kwargs(kwargs)
+        self.assertEquals(new_kwargs['category'], kwargs['category'])
+        self.assertEquals(new_kwargs['name'], kwargs['name'])
+        self.assertEquals(new_kwargs['identifier'], kwargs['identifier'])
+        self.assertEquals(new_kwargs['ponderator'], 0.04)
+        self.assertEquals(new_kwargs['fulfillment'], 0)
+        self.assertEquals(new_kwargs['quality'], 0.0)
+        self.assertEquals(new_kwargs['description'], kwargs['description'])
+
     def test_create_promise(self):
         creator = PromiseCreator()
         creator.get_category(self.row[1])
         promise = creator.create_promise(self.row[2])
+        self.assertIsInstance(promise, Promise)
+        self.assertEquals(promise.name, self.row[2])
+        self.assertEquals(promise, creator.promise)
+        self.assertEquals(promise.category, creator.category)
+        Promise.objects.all().delete()
+        promise = creator.create_promise(name=self.row[2])
         self.assertIsInstance(promise, Promise)
         self.assertEquals(promise.name, self.row[2])
         self.assertEquals(promise, creator.promise)
@@ -306,4 +365,12 @@ class RowProcessorTestCase(CSVLoaderTestCaseBase):
         self.assertTrue(i[1]['called'])
         self.assertEquals(i[2]['name'], 'create_information_source')
         self.assertTrue(i[2]['called'])
+
+    def test_original_creator(self):
+        processor = RowProcessor(self.rows)
+        processor.process()
+        self.assertTrue(Promise.objects.all())
+        self.assertTrue(VerificationDocument.objects.all())
+        self.assertTrue(InformationSource.objects.all())
+
 
