@@ -7,15 +7,13 @@ class PromiseCreator():
     def __init__(self,
                  category_qs=Category.objects.all(),
                  promise_qs=Promise.objects.all(),
-                 verification_doc_qs = VerificationDocument.objects.all(),
-                 information_source_qs = InformationSource.objects.all(),
                  **kwargs):
         self.category = None
         self.kwargs = kwargs
         self.category_qs = category_qs
         self.promise_qs = promise_qs
-        self.verification_doc_qs = verification_doc_qs
-        self.information_source_qs = information_source_qs
+        self.verification_doc_qs = VerificationDocument.objects.filter(promise__in=self.promise_qs)
+        self.information_source_qs = InformationSource.objects.filter(promise__in=self.promise_qs)
         self.warnings = []
 
     def get_category(self, category_name):
