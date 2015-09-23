@@ -16,12 +16,18 @@ class PromiseCreator():
         self.information_source_qs = InformationSource.objects.filter(promise__in=self.promise_qs)
         self.warnings = []
 
-    def get_category(self, category_name):
-        self.category, created = self.category_qs.get_or_create(name=category_name)
+    def get_category(self, category_name, **kwargs):
+        self.category = None
+        try:
+            self.category = self.category_qs.get(name=category_name)
+        except:
+            self.category = self.category_qs.model(name=category_name)
+        for attr, value in kwargs.iteritems():
+            setattr(self.category, attr, value)
+        self.category.save()
         return self.category
 
     def filter_promise_kwargs(self, kwargs):
-        kwargs.update(self.kwargs)
         for key in kwargs.keys():
             if key in ['fulfillment', 'ponderator', 'quality']:
                 value = kwargs[key]
@@ -37,6 +43,7 @@ class PromiseCreator():
 
     def create_promise(self, promise_name=None, **kwargs):
         kwargs = self.filter_promise_kwargs(kwargs)
+        kwargs.update(self.kwargs)
         if promise_name is None and 'name' in kwargs.keys():
             promise_name = kwargs['name']
         search_key = {
@@ -47,7 +54,7 @@ class PromiseCreator():
                 'identifiers__identifier': kwargs['identifier']
             }
         if 'category' in kwargs:
-            self.get_category(kwargs['category'])
+            self.get_category(kwargs['category'], **self.kwargs)
             del kwargs['category']
         self.promise, created = self.promise_qs.get_or_create(**search_key)
         for key, value in kwargs.items():

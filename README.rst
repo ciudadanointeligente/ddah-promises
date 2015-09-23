@@ -13,9 +13,12 @@ Getting Started
 
 Add "ddah-promises" to INSTALLED_APPS::
 
-    **INSTALLED_APPS** = {
+    INSTALLED_APPS = {
     ...
-    'ddah-promises'
+    # If you don't previously have taggit you should probably add it
+    'taggit',
+    'ddah-promises',
+    ...
     }
 
 Include the ddah-promises URLconf in urls.py::

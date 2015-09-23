@@ -6,7 +6,7 @@ def csv_unireader(f, encoding="utf-8"):
         yield [e.decode("utf-8") for e in row]
 
 
-class CsvProcessor():
+class CsvProcessor(object):
     def __init__(self, file_, **kwargs):
         self.file_ = file_
         self.kwargs = kwargs
