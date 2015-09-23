@@ -63,6 +63,9 @@ class CSVCommandTestCase(CSVLoaderTestCaseBase):
         self.assertTrue(Category.objects.all())
         self.assertTrue(VerificationDocument.objects.all())
         self.assertTrue(InformationSource.objects.all())
+        self.assertTrue(processor.warnings)
+        self.assertIn('Exigir que en ciertas unidades relevantes', processor.warnings[0])
+        self.assertIn('Problem parsing ponderator', processor.warnings[0])
         # Using extra params
         file_ = codecs.open(self.csv_file)
         yesterday = timezone.now() - timedelta(days=1)
@@ -309,6 +312,8 @@ class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
 class FakeProcessor():
     def __init__(self):
         self.instructions = []
+        self.warnings = []
+
 
     def __getattr__(self, name):
         dicti = {}

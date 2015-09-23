@@ -7,6 +7,7 @@ class PromiseCreator():
     def __init__(self, **kwargs):
         self.category = None
         self.kwargs = kwargs
+        self.warnings = []
 
     def get_category(self, category_name):
         self.category, created = Category.objects.get_or_create(name=category_name)
@@ -23,7 +24,7 @@ class PromiseCreator():
                     value = float(value)
                 except ValueError:
                     value = 0.0
-                    print 'Problem parsing ', key, kwargs[key]
+                    self.warnings.append('Problem parsing %s at %s with value %s' % (key, kwargs['name'], kwargs[key]))
                 kwargs[key] = value
         return kwargs
 

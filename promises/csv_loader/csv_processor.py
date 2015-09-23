@@ -10,6 +10,7 @@ class CsvProcessor():
     def __init__(self, file_, **kwargs):
         self.file_ = file_
         self.kwargs = kwargs
+        self.warnings = []
 
     def work(self):
         rows = []
@@ -17,3 +18,4 @@ class CsvProcessor():
             rows.append(row)
         processor = RowProcessor(rows, **self.kwargs)
         processor.process()
+        self.warnings = self.warnings + processor.warnings

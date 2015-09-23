@@ -71,6 +71,7 @@ class RowProcessor():
         self.creator = self.creator_class(**kwargs)
         self.header_reader = self.reader_class(rows[0])
         self.rows = rows[1:]
+        self.warnings = []
 
     def read_row(self, row):
         order = self.header_reader.get_creation_instructions()
@@ -83,6 +84,8 @@ class RowProcessor():
                     creator_method(**kwargs[index])
             else:
                 creator_method(**kwargs)
+            if self.creator.warnings is not None:
+                self.warnings = self.warnings + self.creator.warnings
 
     def process(self):
         for row in self.rows:
