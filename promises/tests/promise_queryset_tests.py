@@ -93,6 +93,11 @@ class PromiseQuerysetTestCase(TestCase):
                           (float(1)/float(6))*100)
         expected_total_progress = (float(0 + 50 + 100 + 1 + 99 + 100)/float(6))
         self.assertAlmostEquals(summary.total_progress, expected_total_progress)
+        for p in Promise.objects.all():
+            p.ponderator = 0.16
+            p.save()
+        queryset = Promise.objects.all()
+        summary = queryset.summary()
 
     def test_summary_with_empty_data(self):
         '''Summary calculates correctly the percentage even

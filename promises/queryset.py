@@ -51,8 +51,10 @@ class PromiseQuerySet(models.query.QuerySet):
         not_ponderated = self.filter(ponderator__isnull=True)
         sum_ponderated = ponderated.aggregate(
             ponderator_sum=Sum('ponderator')).get('ponderator_sum') or 0
-        default_ponderated = float(1 - sum_ponderated)/float(
-            not_ponderated.count())
+        default_ponderated = None
+        if not_ponderated:
+            default_ponderated = float(1 - sum_ponderated)/float(
+                not_ponderated.count())
         ponderated_count = 0
         for promise in self.all():
             ponderator = promise.ponderator
