@@ -7,12 +7,13 @@ def csv_unireader(f, encoding="utf-8"):
 
 
 class CsvProcessor():
-    def __init__(self, file_):
+    def __init__(self, file_, **kwargs):
         self.file_ = file_
+        self.kwargs = kwargs
 
     def work(self):
         rows = []
         for row in csv_unireader(self.file_):
             rows.append(row)
-        processor = RowProcessor(rows)
+        processor = RowProcessor(rows, **self.kwargs)
         processor.process()

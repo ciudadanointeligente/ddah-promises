@@ -65,10 +65,10 @@ class HeaderReader():
                 return HEADER_TYPES[key]['what'], instruction
 
 class RowProcessor():
-    def __init__(self, rows, reader_class=HeaderReader, creator_class=PromiseCreator):
+    def __init__(self, rows, reader_class=HeaderReader, creator_class=PromiseCreator, **kwargs):
         self.reader_class = reader_class
         self.creator_class = creator_class
-        self.creator = self.creator_class()
+        self.creator = self.creator_class(**kwargs)
         self.header_reader = self.reader_class(rows[0])
         self.rows = rows[1:]
 

@@ -4,14 +4,16 @@ from popolo.models import Identifier
 
 
 class PromiseCreator():
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.category = None
+        self.kwargs = kwargs
 
     def get_category(self, category_name):
         self.category, created = Category.objects.get_or_create(name=category_name)
         return self.category
 
     def filter_promise_kwargs(self, kwargs):
+        kwargs.update(self.kwargs)
         for key in kwargs.keys():
             if key in ['fulfillment', 'ponderator', 'quality']:
                 value = kwargs[key]

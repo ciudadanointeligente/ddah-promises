@@ -7,6 +7,8 @@ import types
 from django.core.management import call_command
 import os
 import codecs
+from django.utils import timezone
+from datetime import timedelta
 
 
 class CSVLoaderTestCaseBase(TestCase):
@@ -61,6 +63,14 @@ class CSVCommandTestCase(CSVLoaderTestCaseBase):
         self.assertTrue(Category.objects.all())
         self.assertTrue(VerificationDocument.objects.all())
         self.assertTrue(InformationSource.objects.all())
+        # Using extra params
+        file_ = codecs.open(self.csv_file)
+        yesterday = timezone.now() - timedelta(days=1)
+        processor = CsvProcessor(file_, date=yesterday)
+        processor.work()
+        promise = Promise.objects.first()
+        self.assertEquals(promise.date.day, yesterday.day)
+
 
     def test_call_command(self):
         call_command('csv_promises_importer', self.csv_file)
