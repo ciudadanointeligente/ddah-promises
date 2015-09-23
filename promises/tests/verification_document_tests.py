@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.utils.timezone import now
-from ..models import Promise, Fulfillment, VerificationDocument
+from ..models import Promise, VerificationDocument
 from popolo.models import Person
 
 nownow = now()
@@ -23,6 +23,10 @@ class VerificationDocumentTestCase(TestCase):
         self.assertEquals(document.date, nownow)
         self.assertEquals(document.url, 'http://verification.com')
         self.assertEquals(document.display_name, 'verification page')
+        document = VerificationDocument.objects.create(promise=self.promise, \
+                                                       url='http://verification.com',\
+                                                       display_name='verification page')
+        self.assertIsNone(document.date)
 
     def test_related_name_for_relationship(self):
         '''A promise has verification_documents'''

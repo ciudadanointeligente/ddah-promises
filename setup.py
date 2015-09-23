@@ -17,7 +17,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='ddah-promises',
-    version='0.0.2',
+    version='0.0.3',
     packages=['promises'],
     include_package_data=True,
     license='Affero',
@@ -41,6 +41,7 @@ setup(
     ],
     install_requires=[
         'django-popolo',
+        'django-taggit',
     ],
     dependency_links=[
         'http://github.com/openpolis/django-popolo/tarball/master#egg=django-popolo'

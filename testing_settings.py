@@ -12,6 +12,7 @@ DATABASES = {
 INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'popolo',
+    'taggit',
     'promises',
 )
 SITE_ID = 1
