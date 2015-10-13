@@ -44,6 +44,6 @@ setup(
         'django-taggit',
     ],
     dependency_links=[
-        'http://github.com/openpolis/django-popolo/tarball/master#egg=django-popolo'
+        'http://github.com/ciudadanointeligente/django-popolo/tarball/django_version_18#egg=django-popolo'
     ],
 )
