@@ -30,10 +30,6 @@ class PromiseAdmin(admin.ModelAdmin):
 
 admin.site.register(Promise, PromiseAdmin)
 
-class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', )
-admin.site.register(Person, PersonAdmin)
-
 class CategoryAdmin(admin.ModelAdmin):
     pass
 admin.site.register(Category, CategoryAdmin)
