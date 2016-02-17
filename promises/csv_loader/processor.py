@@ -76,16 +76,19 @@ class RowProcessor():
     def read_row(self, row):
         order = self.header_reader.get_creation_instructions()
         for instruction in order:
-            getter = getattr(self.header_reader, instruction['kwargs_getter'])
-            kwargs = getter(row)
-            creator_method = getattr(self.creator, instruction['creation_method'])
-            if instruction['multiple']:
-                for index in kwargs:
-                    creator_method(**kwargs[index])
-            else:
-                creator_method(**kwargs)
-            if self.creator.warnings is not None:
-                self.warnings = self.warnings + self.creator.warnings
+	    try:
+                getter = getattr(self.header_reader, instruction['kwargs_getter'])
+                kwargs = getter(row)
+                creator_method = getattr(self.creator, instruction['creation_method'])
+                if instruction['multiple']:
+                    for index in kwargs:
+                        creator_method(**kwargs[index])
+                else:
+                    creator_method(**kwargs)
+                if self.creator.warnings is not None:
+                    self.warnings = self.warnings + self.creator.warnings
+            except AttributeError:
+                pass
 
     def process(self):
         for row in self.rows:

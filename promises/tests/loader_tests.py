@@ -370,6 +370,15 @@ class RowProcessorTestCase(CSVLoaderTestCaseBase):
         self.assertEquals(i[2]['name'], 'create_information_source')
         self.assertTrue(i[2]['called'])
 
+    def test_dont_create_parts_if_they_are_not_in_the_headers(self):
+        self.rows[0].pop(9)
+        self.rows[0].pop(10)
+        self.rows[1].pop(9)
+        self.rows[1].pop(10)
+        processor = RowProcessor(self.rows)
+        processor.process()
+        self.assertFalse(InformationSource.objects.all())
+
     def test_read_rows(self):
         processor = RowProcessor(self.rows, creator_class=FakeProcessor)
         processor.process()

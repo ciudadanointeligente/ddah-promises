@@ -49,10 +49,10 @@ class PromiseCreator():
         search_key = {
             'name': promise_name
         }
-        if 'identifier' in kwargs:
+        if 'identifier' in kwargs and kwargs['identifier']:
             search_key = {
                 'identifiers__identifier': kwargs['identifier']
-            }
+        }
         if 'category' in kwargs:
             self.get_category(kwargs['category'], **self.kwargs)
             del kwargs['category']
