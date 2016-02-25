@@ -82,6 +82,19 @@ promise with 0%")
                                                  percentage=100)
         self.assertEquals(promise.fulfillment, fulfillment)
 
+    def test_promise_fulfillment_percentage_is_a_float(self):
+        '''Percentage is a float'''
+        promise = Promise.objects.create(name="this is a promise",
+                                         description="this is a description",
+                                         date=nownow,
+                                         person=self.person
+                                         )
+        promise.fulfillment.percentage = 1.45
+        promise.fulfillment.save()
+        fulfillment = Fulfillment.objects.get(promise=promise)
+        self.assertEquals(fulfillment.percentage, 1.45)
+
+
     def test_a_promise_creates_one_fulfillment_automatically(self):
         '''One Promise has one fulfillment automatically'''
         promise = Promise.objects.create(name="this is a promise",

@@ -97,7 +97,7 @@ class VerificationDocument(ExternalDocumentMixin):
 
 class Fulfillment(models.Model):
     promise = models.OneToOneField(Promise)
-    percentage = models.PositiveIntegerField(default=0)
+    percentage = models.FloatField(default=0)
     status = models.TextField(default="", blank=True)
     description = models.TextField(default="", blank=True)
 
