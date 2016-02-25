@@ -67,6 +67,7 @@ class CSVCommandTestCase(CSVLoaderTestCaseBase):
         self.assertIn('Exigir que en ciertas unidades relevantes', processor.warnings[0])
         self.assertIn('Problem parsing ponderator', processor.warnings[0])
         # Using extra params
+        Promise.objects.all().delete()
         file_ = codecs.open(self.csv_file)
         yesterday = timezone.now() - timedelta(days=1)
         processor = CsvProcessor(file_, date=yesterday)
@@ -259,6 +260,7 @@ class PromiseCreatorTestCase(CSVLoaderTestCaseBase):
         self.assertIsNone(promise.category)
 
         # With description
+        promise.delete()
         creator = PromiseCreator()
         promise = creator.create_promise(self.row[2], description=u"la fiera es la mejor")
         self.assertEquals(promise.description, u"la fiera es la mejor")

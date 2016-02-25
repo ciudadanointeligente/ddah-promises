@@ -58,6 +58,8 @@ class PromiseCreator():
             del kwargs['category']
         self.promise, created = self.promise_qs.get_or_create(**search_key)
         for key, value in kwargs.items():
+            if not created:
+                continue
             if key == 'fulfillment':
                 self.promise.fulfillment.percentage = value
                 self.promise.fulfillment.save()
