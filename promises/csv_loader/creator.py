@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 from promises.models import Promise, Category, VerificationDocument, InformationSource
 from popolo.models import Identifier
+from distutils.version import StrictVersion
+import django
+generic_relation_kwargs = {}
+if not StrictVersion(django.get_version()) < StrictVersion("1.9"):
+    generic_relation_kwargs = {'bulk': False}
 
 
 class PromiseCreator():
@@ -31,8 +36,8 @@ class PromiseCreator():
         for key in kwargs.keys():
             if key in ['fulfillment', 'ponderator', 'quality']:
                 value = kwargs[key]
-                value = value.replace('%','')
-                value = value.replace(',','.')
+                value = value.replace('%', '')
+                value = value.replace(',', '.')
                 try:
                     value = float(value)
                 except ValueError:
@@ -50,9 +55,8 @@ class PromiseCreator():
             'name': promise_name
         }
         if 'identifier' in kwargs and kwargs['identifier']:
-            search_key = {
-                'identifiers__identifier': kwargs['identifier']
-        }
+            search_key = {'identifiers__identifier': kwargs['identifier']
+                          }
         if 'category' in kwargs:
             self.get_category(kwargs['category'], **self.kwargs)
             del kwargs['category']
@@ -66,7 +70,7 @@ class PromiseCreator():
                 continue
             if key == 'identifier' and created:
                 i = Identifier(identifier=value)
-                self.promise.identifiers.add(i)
+                self.promise.identifiers.add(i, **generic_relation_kwargs)
                 continue
             setattr(self.promise, key, value)
         self.promise.category = self.category

@@ -3,8 +3,13 @@ from popolo.models import Person, Identifier
 from autoslug import AutoSlugField
 from .queryset import PromiseManager
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.contenttypes import generic
 from taggit.managers import TaggableManager
+from distutils.version import StrictVersion
+import django
+if StrictVersion(django.get_version()) < StrictVersion("1.9"):
+    from django.contrib.contenttypes.generic import GenericRelation
+else:
+    from django.contrib.contenttypes.fields import GenericRelation
 
 
 class Category(models.Model):
@@ -37,7 +42,7 @@ class Promise(models.Model):
     category = models.ForeignKey(Category, related_name="promises", null=True)
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
     ponderator = models.FloatField(default=None, null=True, blank=True)
-    identifiers = generic.GenericRelation(Identifier, help_text="Issued identifiers")
+    identifiers = GenericRelation(Identifier, help_text="Issued identifiers")
     tags = TaggableManager()
 
     objects = PromiseManager()
