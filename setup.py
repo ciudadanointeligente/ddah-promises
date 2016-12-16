@@ -21,7 +21,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='ddah-promises',
-    version='0.0.7',
+    version='0.0.8',
     packages=['promises', 'promises.csv_loader'],
     include_package_data=True,
     license='Affero',
