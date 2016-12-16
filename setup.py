@@ -6,6 +6,10 @@ from setuptools import setup
 
 file_dir = os.path.abspath(os.path.dirname(__file__))
 
+with open('dependency_links.txt') as f:
+    dependency_links = f.read().splitlines()
+with open('requirements.txt') as f:
+    reqs = f.read().splitlines()
 
 def read_file(filename):
     filepath = os.path.join(file_dir, filename)
@@ -17,7 +21,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='ddah-promises',
-    version='0.0.7',
+    version='0.0.8',
     packages=['promises', 'promises.csv_loader'],
     include_package_data=True,
     license='Affero',
@@ -39,11 +43,6 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content'
     ],
-    install_requires=[
-        'django-popolo',
-        'django-taggit',
-    ],
-    dependency_links=[
-        'http://github.com/openpolis/django-popolo/tarball/master#egg=django-popolo'
-    ],
+    install_requires=reqs,
+    dependency_links=dependency_links,
 )
